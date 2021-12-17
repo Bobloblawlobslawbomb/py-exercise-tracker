@@ -4,17 +4,18 @@ from dotenv import load_dotenv
 from datetime import datetime
 import requests
 
-
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 
 NUTRITIONIX_APP_ID = os.environ.get('NUTRITIONIX_APP_ID')
 NUTRITIONIX_API_KEY = os.environ.get('NUTRITIONIX_API_KEY')
+SHEETY_AUTH = os.environ.get('BEARER_AUTH')
 
 gender = os.environ.get('GENDER')
 weight = os.environ.get('WEIGHT')
 height = os.environ.get('HEIGHT')
 age = os.environ.get('AGE')
+
 
 nutritionix_url = "https://trackapi.nutritionix.com/v2/natural/exercise"
 sheety_url = os.environ.get('SHEETY_URL')
@@ -23,6 +24,10 @@ nutri_headers = {
     'x-app-id': NUTRITIONIX_APP_ID,
     'x-app-key': NUTRITIONIX_API_KEY,
     'x-remote-user-id': "0",
+}
+
+sheety_header = {
+    'Authorization': f"Bearer {SHEETY_AUTH}"
 }
 
 user_input = input("What did you do today?: ")
@@ -56,4 +61,4 @@ for workout in workout_list:
     }
 
     sheety_response = requests.post(
-        url=sheety_url, json=workout_info)
+        url=sheety_url, headers=sheety_header, json=workout_info)
