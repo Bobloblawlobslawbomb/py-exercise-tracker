@@ -1,6 +1,7 @@
 import os
 from os.path import join, dirname
 from dotenv import load_dotenv
+from datetime import datetime
 import requests
 
 
@@ -16,6 +17,7 @@ height = os.environ.get('HEIGHT')
 age = os.environ.get('AGE')
 
 nutritionix_url = "https://trackapi.nutritionix.com/v2/natural/exercise"
+sheety_url = os.environ.get('SHEETY_URL')
 
 nutri_headers = {
     'x-app-id': NUTRITIONIX_APP_ID,
@@ -33,8 +35,25 @@ exercise_data = {
     'age': age
 }
 
+today = datetime.now()
+today_date = str(today.strftime("%y/%m/%d"))
+today_time = today.strftime("%H:%M:%S")
+
 nutrition_response = requests.post(
     url=nutritionix_url, headers=nutri_headers, json=exercise_data)
 
-print(nutrition_response.text)
-print(nutrition_response.json())
+workout_list = nutrition_response.json()['exercises']
+
+for workout in workout_list:
+    workout_info = {
+        'workout': {
+            "date": today_date,
+            "time": today_time,
+            "exercise": workout["name"].title(),
+            "duration": workout["duration_min"],
+            "calories": workout["nf_calories"]
+        }
+    }
+
+    sheety_response = requests.post(
+        url=sheety_url, json=workout_info)
